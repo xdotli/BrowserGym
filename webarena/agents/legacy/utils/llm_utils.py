@@ -97,6 +97,8 @@ def retry(
             msg = f"Query failed. Retrying {tries}/{n_retry}.\n[LLM]:\n{answer.content}\n[User]:\n{retry_message}"
             logging.info(msg)
         messages.append(HumanMessage(content=retry_message))
+    
+    
 
     raise ValueError(f"Could not parse a valid value after {n_retry} retries.")
 

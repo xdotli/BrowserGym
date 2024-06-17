@@ -29,9 +29,9 @@ class DemoAgent(Agent):
         super().__init__()
         self.model_name = model_name
 
-        from openai import OpenAI
+        from openai import AzureOpenAI
 
-        self.openai_client = OpenAI()
+        self.openai_client = AzureOpenAI()
 
     def get_action(self, obs: dict) -> tuple[str, dict]:
         system_msg = f"""\

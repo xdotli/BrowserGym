@@ -137,3 +137,6 @@ error_logs.txt
 # tests
 tests/results
 tmp.py
+
+# ignore results
+results/

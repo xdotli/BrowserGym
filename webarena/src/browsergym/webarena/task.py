@@ -159,7 +159,7 @@ If you believe the task is impossible to complete, provide the answer "N/A".
 
         # if any, use the last assistant message as the stop answer for webarena
         if chat_messages and chat_messages[-1]["role"] == "assistant":
-            last_action = {"action_type": ActionTypes.STOP, "answer": chat_messages[-1]["message"]}
+            last_action = {"action_type": ActionTypes.STOP, "answer": chat_messages[-1]["message"]} # if and only if the assistant issue a send_message action / report infeasible action (which will append assistant message to chat_messages and trigger the stop action here)
         else:
             last_action = {"action_type": ActionTypes.NONE, "answer": ""}
             # llm_fuzzy_match() bugfix
