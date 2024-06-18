@@ -518,7 +518,7 @@ document.addEventListener("visibilitychange", () => {
             "last_action": self.last_action,
             "last_action_error": self.last_action_error,
             "elapsed_time": np.asarray([time.time() - self.start_time]),
-            "page": self.page,
+            # "page": self.page,
         }
 
         return obs
