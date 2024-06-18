@@ -2,13 +2,14 @@ import inspect
 import random
 
 from dataclasses import dataclass
-from typing import Literal, Optional
+from typing import Literal, Optional, List
 
 from . import utils
 from .base import AbstractActionSet
 from .functions import (
     noop,
     send_msg_to_user,
+    stop,
     report_infeasible,
     fill,
     # check,
@@ -46,6 +47,8 @@ from .parsers import highlevel_action_parser, action_docstring_parser
 
 
 CHAT_ACTIONS = [send_msg_to_user]
+
+WEBARENA_EXTRA_ACTIONS = [stop]
 
 INFEAS_ACTIONS = [report_infeasible]
 
@@ -101,11 +104,11 @@ class HighLevelAction:
 
 class HighLevelActionSet(AbstractActionSet):
 
-    ActionSubset = Literal["chat", "infeas", "bid", "coord", "nav", "tab", "custom"]
+    ActionSubset = List[Literal["chat", "infeas", "bid", "coord", "nav", "tab", "custom", "webarena"]]
 
     def __init__(
         self,
-        subsets: Optional[ActionSubset | list[ActionSubset]] = [
+        subsets: Optional[ActionSubset] = [
             "chat",
             "bid",
             "nav",
@@ -144,6 +147,8 @@ class HighLevelActionSet(AbstractActionSet):
                         allowed_actions.extend(NAV_ACTIONS)
                     case "tab":
                         allowed_actions.extend(TAB_ACTIONS)
+                    case "webarena":
+                        allowed_actions.extend(WEBARENA_EXTRA_ACTIONS)
                     case "custom":
                         if not custom_actions:
                             raise ValueError(

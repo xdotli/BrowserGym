@@ -12,6 +12,7 @@ from .utils import (
 
 page: playwright.sync_api.Page = None
 send_message_to_user: callable = None
+stop_and_output: callable = None
 report_infeasible_instructions: callable = None
 demo_mode: Literal["off", "default", "all_blue", "only_visible_elements"] = None
 
@@ -29,6 +30,16 @@ def send_msg_to_user(text: str):
         send_msg_to_user("Based on the results of my search, the city was built in 1751.")
     """
     send_message_to_user(text)
+
+# this action is for running experiments on WebArena only
+def stop(answer: str):
+    """
+    Call this function when you believe the task is complete. If the objective is to find a text-based answer, provide the answer in the bracket. If you believe the task is impossible to complete, provide the answer as "N/A" in the bracket.
+
+    Examples:
+        stop("1751")
+    """
+    stop_and_output(answer)
 
 
 def report_infeasible(reason: str):

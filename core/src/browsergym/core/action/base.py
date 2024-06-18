@@ -34,6 +34,7 @@ class AbstractActionSet(ABC):
 def execute_python_code(
     code: str,
     page: playwright.sync_api.Page,
+    stop_and_output: callable,
     send_message_to_user: callable,
     report_infeasible_instructions: callable,
 ):
@@ -53,6 +54,7 @@ def execute_python_code(
     globals = {
         "page": page,
         "send_message_to_user": send_message_to_user,
+        "stop_and_output": stop_and_output,
         "report_infeasible_instructions": report_infeasible_instructions,
     }
 

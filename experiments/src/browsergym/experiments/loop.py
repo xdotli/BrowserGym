@@ -147,6 +147,8 @@ class ExpArgs:
         self.exp_dir.mkdir(parents=True, exist_ok=True)
         with open(self.exp_dir / "exp_args.pkl", "wb") as f:
             pickle.dump(self, f)
+        
+        return self.exp_dir
 
     # TODO distinguish between agent error and environment or system error. e.g.
     # the parsing error of an action should not be re-run.
@@ -186,6 +188,9 @@ class ExpArgs:
 
                 step_info.save_step_info(self.exp_dir)
                 logger.debug(f"Step info saved.")
+
+                step_info.save_step_chat_messages(self.exp_dir)
+                logger.debug(f"Chat messages saved.")
 
                 _send_chat_info(env.unwrapped.chat, action, step_info.agent_info)
                 logger.debug(f"Chat info sent.")
@@ -359,7 +364,7 @@ class StepInfo:
         }
         stats.update(self.agent_info.pop("stats", {}))
 
-        messages = self.agent_info.get("chat_messages", None)
+        messages = self.agent_info.get("chat_message_contents", None)
         if messages is not None:
             stats["n_token_agent_messages"] = count_messages_token(messages)
 
@@ -368,6 +373,36 @@ class StepInfo:
         stats["agent_elapsed"] = t.agent_stop - t.agent_start
 
         self.stats = stats
+    
+    def save_step_chat_messages(self, exp_dir: Path):
+        """
+        Save the chat messages locally in a file.
+        """
+        if "chat_messages" in self.agent_info:
+            chat_messages = self.agent_info["chat_messages"]
+            chat_messages_path = exp_dir / f"chat_messages_step_{self.step}.txt"
+            
+            chat_message_str = ""
+
+            round = 0
+            for message in chat_messages:
+                if message.type == "system":
+                    chat_message_str += "[SYSTEM]\n" + message.content + "\n"
+                elif message.type == "human":
+                    # check whether message.content is a list of messages
+                    content = message.content
+                    if isinstance(content, list):
+                        content = message.content[0].get("text", "") # only take the text part
+                    chat_message_str += "-----------------------------------\n"
+                    chat_message_str += "Round " + str(round) + "\n"
+                    chat_message_str += "[USER]\n" + content + "\n"
+                elif message.type == "ai":
+                    chat_message_str += "[ASSISTANT]\n" + message.content + "\n"
+                round += 1
+            
+            with open(chat_messages_path, "w") as f:
+                f.write(chat_message_str)
+
 
     def save_step_info(self, exp_dir, save_json=False, save_jpg=True):
 

@@ -143,7 +143,8 @@ does not support vision. Disabling use_screenshot."""
         self.memories.append(ans_dict.get("memory", None))
         self.thoughts.append(ans_dict.get("think", None))
 
-        ans_dict["chat_messages"] = [m.content for m in chat_messages]
+        ans_dict["chat_message_contents"] = [m.content for m in chat_messages]
+        ans_dict["chat_messages"] = chat_messages
         ans_dict["chat_model_args"] = asdict(self.chat_model_args)
 
         return ans_dict["action"], ans_dict

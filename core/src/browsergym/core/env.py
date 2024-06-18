@@ -312,6 +312,10 @@ document.addEventListener("visibilitychange", () => {
 
         def send_message_to_user(text: str):
             self.chat.add_message(role="assistant", msg=text)
+        
+        # for webarena only
+        def stop_and_output(answer: str):
+            self.chat.add_message(role="assistant", msg=answer)
 
         def report_infeasible_instructions(reason: str):
             self.chat.add_message(role="infeasible", msg=reason)
@@ -324,10 +328,13 @@ document.addEventListener("visibilitychange", () => {
                 code = self.action_mapping(action)
             else:
                 code = action
+            
+            # need to add the function here if it is not executed by playwright codes defined in it
             execute_python_code(
                 code,
                 self.page,
                 send_message_to_user=send_message_to_user,
+                stop_and_output=stop_and_output,
                 report_infeasible_instructions=report_infeasible_instructions,
             )
             self.last_action_error = ""
@@ -511,6 +518,7 @@ document.addEventListener("visibilitychange", () => {
             "last_action": self.last_action,
             "last_action_error": self.last_action_error,
             "elapsed_time": np.asarray([time.time() - self.start_time]),
+            "page": self.page,
         }
 
         return obs
