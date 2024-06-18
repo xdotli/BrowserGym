@@ -98,7 +98,7 @@ def retry(
             logging.info(msg)
         messages.append(HumanMessage(content=retry_message))
     
-    
+
 
     raise ValueError(f"Could not parse a valid value after {n_retry} retries.")
 

@@ -8,9 +8,9 @@ import logging
 import platform
 
 from copy import deepcopy
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from textwrap import dedent
-from typing import Literal
+from typing import Literal, List
 from warnings import warn
 
 from browsergym.core.action.base import AbstractActionSet
@@ -41,9 +41,11 @@ class Flags:
     use_concrete_example: bool = True
     use_abstract_example: bool = False
     multi_actions: bool = False
-    action_space: Literal[
-        "python", "bid", "coord", "bid+coord", "bid+nav", "coord+nav", "bid+coord+nav"
-    ] = "bid"
+    action_space: List[
+        Literal[
+            "python", "chat", "bid", "coord", "nav", "webarena"
+        ]
+     ] = field(default_factory=lambda: ["bid"])
     is_strict: bool = False
     # This flag will be automatically disabled `if not chat_model_args.has_vision()`
     use_screenshot: bool = True
@@ -244,6 +246,10 @@ Note: bounding box of each object are provided in parenthesis and are
             coord_note = ""
         self._prompt = f"\n{prefix}AXTree:\n{coord_note}{ax_tree}\n"
 
+class ScreenShot(Trunkater):
+    def __init__(self, visible: bool = True, screenshot_placeholder: str = "The image provided for you", prefix="") -> None:
+        super().__init__(visible=visible, start_trunkate_iteration=10)
+        self._prompt = f"\n{prefix}ScreenShot:\n{screenshot_placeholder}\n"
 
 class Error(PromptElement):
     def __init__(self, error, visible: bool = True, prefix="") -> None:
@@ -268,6 +274,7 @@ class Observation(Shrinkable):
             coord_type=flags.extract_coords,
             prefix="## ",
         )
+        self.screenshot = ScreenShot(visible=lambda: flags.use_screenshot,screenshot_placeholder="The image provided for you", prefix="## ")
         self.error = Error(
             obs["last_action_error"],
             visible=lambda: flags.use_error_logs and obs["last_action_error"],
@@ -280,7 +287,7 @@ class Observation(Shrinkable):
 
     @property
     def _prompt(self) -> str:
-        return f"\n# Observation of current step:\n{self.html.prompt}{self.ax_tree.prompt}{self.error.prompt}\n\n"
+        return f"\n# Observation of current step:\n{self.screenshot.prompt}{self.html.prompt}{self.ax_tree.prompt}{self.error.prompt}\n\n"
 
     def add_screenshot(self, prompt):
         if self.flags.use_screenshot:
@@ -318,6 +325,10 @@ class GoalInstructions(PromptElement):
 Review the current state of the page and all other information to find the best
 possible next action to accomplish your goal. Your answer will be interpreted
 and executed by a program, make sure to follow the formatting instructions.
+
+To be successful, it is very important to follow the following rules:
+1. Issue stop action when you think you have achieved the objective. Don't generate anything after stop.
+2. Even the ID of the same element can change between different pages. Always refer to the current page.
 
 ## Goal:
 {goal}
@@ -467,8 +478,13 @@ class ActionSpace(PromptElement):
 
 
 def _get_action_space(flags: Flags) -> AbstractActionSet:
-    match flags.action_space:
-        case "python":
+    # do not add "chat" by default here
+    if "python" in flags.action_space:
+        if len(flags.action_space) > 1:
+            raise NotImplementedError(
+                f"Python action space is incompatible with other action spaces: {flags.action_space}"
+            )
+        else:
             action_space = PythonActionSet(strict=flags.is_strict)
             if flags.multi_actions:
                 warn(
@@ -479,20 +495,34 @@ def _get_action_space(flags: Flags) -> AbstractActionSet:
                     f"Flag action_space={repr(flags.action_space)} incompatible with demo_mode={repr(flags.demo_mode)}."
                 )
             return action_space
-        case "bid":
-            action_subsets = ["chat", "bid"]
-        case "coord":
-            action_subsets = ["chat", "coord"]
-        case "bid+coord":
-            action_subsets = ["chat", "bid", "coord"]
-        case "bid+nav":
-            action_subsets = ["chat", "bid", "nav"]
-        case "coord+nav":
-            action_subsets = ["chat", "coord", "nav"]
-        case "bid+coord+nav":
-            action_subsets = ["chat", "bid", "coord", "nav"]
-        case _:
-            raise NotImplementedError(f"Unknown action_space {repr(flags.action_space)}")
+    action_subsets = flags.action_space
+
+    # match flags.action_space:
+    #     case "python":
+    #         action_space = PythonActionSet(strict=flags.is_strict)
+    #         if flags.multi_actions:
+    #             warn(
+    #                 f"Flag action_space={repr(flags.action_space)} incompatible with multi_actions={repr(flags.multi_actions)}."
+    #             )
+    #         if flags.demo_mode != "off":
+    #             warn(
+    #                 f"Flag action_space={repr(flags.action_space)} incompatible with demo_mode={repr(flags.demo_mode)}."
+    #             )
+    #         return action_space
+    #     case "bid":
+    #         action_subsets = ["chat", "bid"]
+    #     case "coord":
+    #         action_subsets = ["chat", "coord"]
+    #     case "bid+coord":
+    #         action_subsets = ["chat", "bid", "coord"]
+    #     case "bid+nav":
+    #         action_subsets = ["chat", "bid", "nav"]
+    #     case "coord+nav":
+    #         action_subsets = ["chat", "coord", "nav"]
+    #     case "bid+coord+nav":
+    #         action_subsets = ["chat", "bid", "coord", "nav"]
+    #     case _:
+    #         raise NotImplementedError(f"Unknown action_space {repr(flags.action_space)}")
 
     action_space = HighLevelActionSet(
         subsets=action_subsets,

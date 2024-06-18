@@ -131,20 +131,20 @@ does not support vision. Disabling use_screenshot."""
         try:
             ans_dict = retry(self.chat_llm, chat_messages, n_retry=self.max_retry, parser=parser)
 
-            # replace the base64 in the messages with a placeholder to print the messages
-            for m in chat_messages:
-                content = m.content
-                for i in range(len(content)):
-                    if "image_url" in content[i]:
-                        content[i]["image_url"]["url"] = "[IMAGE]"
-                m.content = content
-            # print system message
-            print("System message:")
-            print(chat_messages[0].content)
-            print("*"*100)
-            # print human message
-            print("Human message:")
-            print(chat_messages[1].content[0].get("text", ""))
+            # # replace the base64 in the messages with a placeholder to print the messages
+            # for m in chat_messages:
+            #     content = m.content
+            #     for i in range(len(content)):
+            #         if "image_url" in content[i]:
+            #             content[i]["image_url"]["url"] = "[IMAGE]"
+            #     m.content = content
+            # # print system message
+            # print("System message:")
+            # print(chat_messages[0].content)
+            # print("*"*100)
+            # # print human message
+            # print("Human message:")
+            # print(chat_messages[1].content[0].get("text", ""))
 
 
             # inferring the number of retries, TODO: make this less hacky
@@ -161,7 +161,8 @@ does not support vision. Disabling use_screenshot."""
         self.memories.append(ans_dict.get("memory", None))
         self.thoughts.append(ans_dict.get("think", None))
 
-        ans_dict["chat_messages"] = [m.content for m in chat_messages]
+        ans_dict["chat_messages"] = chat_messages
+        ans_dict["chat_message_contents"] = [m.content for m in chat_messages]
         ans_dict["chat_model_args"] = asdict(self.chat_model_args)
 
         return ans_dict["action"], ans_dict
