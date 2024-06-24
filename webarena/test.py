@@ -86,8 +86,8 @@ def parse_args():
         "--action_space",
         type=str,
         nargs="+",
-        default=["bid", "webarena"],
-        choices=["python", "bid", "coord", "nav", "stop"],
+        default=["bid", "nav", "webarena"],
+        choices=["python", "bid", "coord", "nav", "stop", "shopping_admin_extra"],
         help="Action space to use",
     )
     parser.add_argument(

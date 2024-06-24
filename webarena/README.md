@@ -63,6 +63,9 @@ Note:
 2. If still encountering any package missing after steps before, install the package by yourself. (The whole requirements.txt will be added in the future.)
 
 ## Dev
+The current agent codes are in /home/ytliu/github/BrowserGym/webarena/agents/legacy. 
+### Modifying prompts
+Prompts of the agent are located in /home/ytliu/github/BrowserGym/webarena/agents/legacy/dynamic_prompting.py. Modifying the corresponding part as you need.
 
 ### Augment action space
 In BrowserGym, actions outputted by the model are in the format of a function call. e.g. click(123). The definition of the action functions are in core/action/functions.py.
@@ -73,7 +76,7 @@ Here are general steps to augment the action space
     - If your action needs to call a external function like what "send_msg_to_user" does, you may define the external functions you need as None firstly and in the steps later, we will instruct you to define the external functions and pass it through.
     - Add proper comments as other functions do. This will be prompted to the agent as the description of the function
 
-2. [Optional] If your function contains external functions (e.g. send_message_to_user) that have not been defined yet. Go to core/env.py and navigate to the step function in the BrowserGym class. defines the external functions here (e.g. send_message_to_user) and pass it through the execute_python_code (you may also need to go to execute_python_code and add another allowed param).
+2. [Optional] If your function contains external functions (e.g. send_message_to_user) that have not been defined yet. Go to core/env.py and navigate to the step function in the BrowserGym class. defines the external functions here (e.g. send_message_to_user) and pass it through the execute_python_code.
 
 3. Go to core/actions/highlevel.py.
     - import the action function from .functions

@@ -320,6 +320,10 @@ document.addEventListener("visibilitychange", () => {
         def report_infeasible_instructions(reason: str):
             self.chat.add_message(role="infeasible", msg=reason)
             self.infeasible_message_received = True
+        
+        def go_to_best_seller_page():
+            page = self.page
+            page.goto("http://localhost:7780/admin/reports/report_sales/bestsellers/")
 
         # try to execute the action
         logger.debug(f"Executing action")
@@ -333,9 +337,12 @@ document.addEventListener("visibilitychange", () => {
             execute_python_code(
                 code,
                 self.page,
-                send_message_to_user=send_message_to_user,
-                stop_and_output=stop_and_output,
-                report_infeasible_instructions=report_infeasible_instructions,
+                custom_functions={
+                    "send_message_to_user": send_message_to_user,
+                    "report_infeasible_instructions": report_infeasible_instructions,
+                    "stop_and_output": stop_and_output,
+                    "go_to_bs_page": go_to_best_seller_page
+                },
             )
             self.last_action_error = ""
         except Exception as e:

@@ -42,9 +42,13 @@ from .functions import (
     go_back,
     go_forward,
     goto,
+
+    go_to_best_seller_page
 )
 from .parsers import highlevel_action_parser, action_docstring_parser
 
+# augmented spaces for webarena aci experiments
+SHOPPING_ADMIN_EXTRA = [go_to_best_seller_page]
 
 CHAT_ACTIONS = [send_msg_to_user]
 
@@ -104,7 +108,7 @@ class HighLevelAction:
 
 class HighLevelActionSet(AbstractActionSet):
 
-    ActionSubset = List[Literal["chat", "infeas", "bid", "coord", "nav", "tab", "custom", "stop"]]
+    ActionSubset = List[Literal["chat", "infeas", "bid", "coord", "nav", "tab", "custom", "stop", "shopping_admin_extra"]]
 
     def __init__(
         self,
@@ -149,6 +153,8 @@ class HighLevelActionSet(AbstractActionSet):
                         allowed_actions.extend(TAB_ACTIONS)
                     case "stop":
                         allowed_actions.extend(WEBARENA_STOP)
+                    case "shopping_admin_extra":
+                        allowed_actions.extend(SHOPPING_ADMIN_EXTRA)
                     case "custom":
                         if not custom_actions:
                             raise ValueError(

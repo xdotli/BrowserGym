@@ -16,11 +16,23 @@ stop_and_output: callable = None
 report_infeasible_instructions: callable = None
 demo_mode: Literal["off", "default", "all_blue", "only_visible_elements"] = None
 
+go_to_bs_page: callable = None
+
 """IMPORTANT
 The following primitives are meant to be included in the browsergym action using
 inspect.getsource().
 """
 
+# augmented actions here:
+
+def go_to_best_seller_page():
+    """
+    Navigate to the best seller page of the shopping admin website.
+
+    Examples:
+        go_to_best_seller_page()
+    """
+    go_to_bs_page()
 
 def send_msg_to_user(text: str):
     """
