@@ -87,8 +87,8 @@ def parse_args():
         type=str,
         nargs="+",
         default=["bid", "webarena"],
-        choices=["python", "bid", "coord", "nav", "webarena"],
-        help="",
+        choices=["python", "bid", "coord", "nav", "stop"],
+        help="Action space to use",
     )
     parser.add_argument(
         "--use_history",

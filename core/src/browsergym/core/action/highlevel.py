@@ -48,7 +48,7 @@ from .parsers import highlevel_action_parser, action_docstring_parser
 
 CHAT_ACTIONS = [send_msg_to_user]
 
-WEBARENA_EXTRA_ACTIONS = [stop]
+WEBARENA_STOP = [stop]
 
 INFEAS_ACTIONS = [report_infeasible]
 
@@ -104,7 +104,7 @@ class HighLevelAction:
 
 class HighLevelActionSet(AbstractActionSet):
 
-    ActionSubset = List[Literal["chat", "infeas", "bid", "coord", "nav", "tab", "custom", "webarena"]]
+    ActionSubset = List[Literal["chat", "infeas", "bid", "coord", "nav", "tab", "custom", "stop"]]
 
     def __init__(
         self,
@@ -147,8 +147,8 @@ class HighLevelActionSet(AbstractActionSet):
                         allowed_actions.extend(NAV_ACTIONS)
                     case "tab":
                         allowed_actions.extend(TAB_ACTIONS)
-                    case "webarena":
-                        allowed_actions.extend(WEBARENA_EXTRA_ACTIONS)
+                    case "stop":
+                        allowed_actions.extend(WEBARENA_STOP)
                     case "custom":
                         if not custom_actions:
                             raise ValueError(
