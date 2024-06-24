@@ -17,7 +17,7 @@ pip install langchain_community
 python -c "import nltk; nltk.download('punkt')"
 ```
 
-3. Setup the web servers (follow the [webarena README](https://github.com/web-arena-x/webarena/blob/main/environment_docker/README.md)).
+3. Setup/Reset the web servers (follow the [webarena README](https://github.com/web-arena-x/webarena/blob/main/environment_docker/README.md)).
 ```sh
 BASE_URL=<YOUR_SERVER_URL_HERE>
 ```
@@ -45,7 +45,7 @@ export OPENAI_API_VERSION=...
 6. Run the benchmark
 For some server, you need to specify the PYTHONPATH
 ```sh
-export PYTHONPATH=<PATH TO THE REPO>
+export PYTHONPATH=<ABSOLUTE PATH TO THE REPO>
 ```
 To run all examples in WebArena, run the following command:
 ```sh
@@ -55,7 +55,7 @@ python test.py --task_name webarena_all --model_name azureopenai/gpt-4o-2024-05-
 
 To run a specific example in WebArena, run the following command:
 ```sh
-python webarena/test.py --task_name webarena.$TASK_ID --model_name azureopenai/gpt-4o-2024-05-13 --headless t --use_html f --action_space bid webarena nav
+python test.py --task_name webarena.$TASK_ID --model_name azureopenai/gpt-4o-2024-05-13 --headless t --use_html f --action_space bid webarena nav
 ```
 
 Note: 
